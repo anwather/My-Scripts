@@ -1,4 +1,4 @@
-Enter file conparam(
+param(
 
 [Parameter(Mandatory=$true)][String]$ComputerName,[switch]$Restart)
 
@@ -220,7 +220,7 @@ try
     }
 catch
     {
-        Write-Host "Unable to determine if a reboot is required"
+        Write-Host "-E- Unable to determine if a reboot is required"
         exit;
     }
 
@@ -238,7 +238,7 @@ if ($Restart)
         Write-Output "-I- Restarting computer: $computername"
         try
             {
-                Restart-Computer -ComputerName $computername -Force -Confirm -Verbose -ErrorAction STOP
+                Restart-Computer -ComputerName $computername -Force -Verbose -ErrorAction STOP
             }
         catch
             {
@@ -256,17 +256,18 @@ else
     {
     if ($rebootRequired)
         {
-        Write-Output "-I- $computername requires a restart - the next command will prompt if you want this to happen"
+        Write-Output "-W- $computername requires a restart - the next command will prompt if you want this to happen"
         try
             {
                 Restart-Computer -ComputerName $computername -Force -Confirm -Verbose -ErrorAction STOP
+		Write-Output "-I- Machine has been restarted"
             }
         catch
             {
                 Write-Host "-E- Machine may have failed rebooting - please confirm success" -ForegroundColor Red
                 exit;
             }
-        Write-Output "-I- Machine has been restarted"
+        
         }
     }
 
@@ -284,4 +285,3 @@ Remove-PSSession *
 
 
 
-tents here
