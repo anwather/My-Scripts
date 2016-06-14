@@ -5,6 +5,8 @@
         [string]$StorageAccountName,
         [string]$StorageContainerName,
         [string]$File,
+
+        [ValidateScript({Test-Path $_})]
         [string]$Destination
          )
 
