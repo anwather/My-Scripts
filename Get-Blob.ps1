@@ -6,6 +6,8 @@
     Param(
         [string]$ResourceGroupName,
         [string]$StorageAccountName,
+        
+        [ValidateScript({$_ -match "^[a-z]*$"})]
         [string]$StorageContainerName,
         [string]$File,
 
