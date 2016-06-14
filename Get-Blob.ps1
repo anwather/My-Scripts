@@ -1,6 +1,12 @@
 ﻿Function Get-Blob
     {
-    Param($ResourceGroupName,$StorageAccountName,$StorageContainerName,$File,$Destination)
+    Param(
+        [string]$ResourceGroupName,
+        [string]$StorageAccountName,
+        [string]$StorageContainerName,
+        [string]$File,
+        [string]$Destination
+         )
 
     $context = Get-AzureRmStorageAccount -ResourceGroupName $ResourceGroupName -Name $StorageAccountName -Verbose
 
