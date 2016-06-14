@@ -1,5 +1,8 @@
 ﻿Function Get-Blob
     {
+
+    [CmdletBinding()]
+
     Param(
         [string]$ResourceGroupName,
         [string]$StorageAccountName,
