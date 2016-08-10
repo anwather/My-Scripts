@@ -7,7 +7,7 @@
     $ComputerName
     )
 
-    $ipAddress = (Get-AzureRmPublicIpAddress -Name $computerName -ResourceGroupName $resourceGroupName).IpAddress
+    $ipAddress = Get-AzureRmPublicIpAddress -ResourceGroupName $resourceGroupName | Where Name -match $ComputerName | Select -ExpandProperty IpAddress
     
     $cmd = "mstsc /v:$ipaddress`:3389"
 
