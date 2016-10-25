@@ -24,7 +24,7 @@ workflow WF-Stop-AllVMs
             }
         }
 
-        $obj = Get-AzureRmResourceGroup | Foreach {Get-AzureRMVM -ResourceGroupName $_.ResourceGroupName} | % {Get-AzureRMVM -ResourceGroupName $_.ResourceGroupName -Name $_.Name -Status} | Where {$_.Statuses.Code -notmatch "deallocated"} | Select ResourceGroupName,Name
+        $obj = Get-AzureRmResourceGroup | Foreach {Get-AzureRMVM -ResourceGroupName $_.ResourceGroupName} | % {Get-AzureRMVM -ResourceGroupName $_.ResourceGroupName -Name $_.Name -Status} | Where {$_.Statuses[1].Code -notmatch "deallocated"} | Select ResourceGroupName,Name
         Write-Output $obj 
 
         Foreach -parallel ($o in $obj)
