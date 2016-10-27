@@ -1,21 +1,63 @@
 ﻿Import-Module 'D:\Program Files\Microsoft Configuration Manager\AdminConsole\bin\ConfigurationManager.psd1' # Import the ConfigurationManager.psd1 module 
 Set-Location 'xxx:' # Set the current location to be the site code.
 
-$obj = Import-CSV -Path C:\Temp\xxx.csv
-
-foreach ($o in $obj)
+function Get-CMSubnetsFromFile
     {
-        $testExist = $null
-        $snet = [regex]::Replace($o.Subnet,"/\d+","")
-        $testExist = Get-CMBoundary | Where-Object Value -eq $snet 
-        if (!($testExist))
+    [CmdletBinding()]
+    Param(
+    [Parameter(Mandatory=$true,ValueFromPipeline=$true)]
+    [ValidateScript({Test-Path $_})]
+    [string[]]$Path
+    )
+
+Process {
+            $IPAddressArray = @()
+            $location = $null
+
+            Switch -Regex (Get-Content $_)
+                {
+                "xxx" {$location = "xxx";break}
+                "xxx" {$location = "xxx";break}
+                }
+
+            if ($location -eq $null)
+                {
+                    throw "Location cannot be determined"
+                }
+
+            Switch -Regex (Get-Content $_)
+                {
+                "C\s{8}(?<IPSubnet>(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([1-2])(([0-9]|[1-2][0-9]))))" {$IPSubnet = [regex]::Replace($Matches.IPSubnet,"/\d+","");$obj=[pscustomobject]@{"IPSubnet"=$IPSubnet;"Location"=$location};$IPAddressArray+=$obj}
+                }
+
+            return $IPAddressArray
+        }
+    }
+
+function Create-CMBoundary
+    {
+    [CmdletBinding()]
+    Param(
+    [Parameter(Mandatory=$true,ValueFromPipeline=$true)]
+    [PSCustomObject[]]$InputObject
+    )
+
+Process {
+    $testExist = $null
+    $testExist = Get-CMBoundary | Where-Object Value -eq $_.IPSubnet
+    if (!($testExist))
             {
-                $boundary = New-CMBoundary -Name $o.Campus -Type IPSubnet -Value $snet
+                Write-Verbose "Creating new boundary: $($_.Location) -- $($_.IPSubnet)"
+                $boundary = New-CMBoundary -Name $_.Location -Type IPSubnet -Value $_.IPSubnet
                 switch ($boundary)
                     {
-                        {$boundary.DisplayName -eq "loc1"} {Add-CMBoundaryToGroup -InputObject $_ -BoundaryGroupName "loc1"}
-                        {$boundary.DisplayName -eq "loc2"} {Add-CMBoundaryToGroup -InputObject $_ -BoundaryGroupName "loc2"}
-                        {$boundary.DisplayName -eq "loc3"} {Add-CMBoundaryToGroup -InputObject $_ -BoundaryGroupName "loc3"}
+                        {$boundary.DisplayName -eq "xxx"} {Add-CMBoundaryToGroup -InputObject $_ -BoundaryGroupName "xxx"}
+                        {$boundary.DisplayName -eq "xxx"} {Add-CMBoundaryToGroup -InputObject $_ -BoundaryGroupName "xxx"}
+                        #{$boundary.DisplayName -eq "loc3"} {Add-CMBoundaryToGroup -InputObject $_ -BoundaryGroupName "loc3"}
                     }
-            }   
+            }
+        }
+
     }
+
+Get-ChildItem -Path C:\Temp\*.txt | Get-CMSubnetsFromFile | Create-CMBoundary -Verbose
