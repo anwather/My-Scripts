@@ -1,0 +1,188 @@
+﻿# VB Script vs PowerShell
+
+# ----------------------------------------------------------
+# Getting a computer name
+# ----------------------------------------------------------
+
+# VBScript
+
+Set objWMISvc = GetObject( "winmgmts:\\.\root\cimv2" )
+ Set colItems = objWMISvc.ExecQuery( "Select * from Win32_ComputerSystem", , 48 )
+ For Each objItem in colItems
+     strComputerName = objItem.Name
+     WScript.Echo "Computer Name: " & strComputerName
+ Next
+
+# PowerShell
+
+Write-Output (Get-WmiObject win32_computersystem).Name
+
+$env:COMPUTERNAME
+
+# ----------------------------------------------------------
+# Reboot computer function
+# ----------------------------------------------------------
+
+# VB Script
+
+<#Function RestartAction
+  If silent = 0 Then objdiv.innerhtml = strStatus & "<br> Now performing restart action (" & restarttext & ")."
+  wscript.sleep 4000
+  writelog("Processing RestartAction")
+                'On Error GoTo 0
+                Dim OpSysSet, OpSys
+                'writelog("Computer: " & strComputer & vbcrlf & "Restart Action: " & strRestart)
+
+                'On Error Resume Next
+                
+                'Call WMI query to collect parameters for reboot action
+                Set OpSysSet = GetObject("winmgmts:{(Shutdown)}//" & strComputer & "/root/cimv2").ExecQuery("select * from Win32_OperatingSystem"_
+                & " where Primary=true") 
+                 
+                If CStr(err.number) <> 0 Then 
+                  strMsg = "There was an error while attempting to connect to " & strComputer & "." & vbcrlf & vbcrlf _
+                                & "The actual error was: " & err.description
+                                writelog(strMsg)
+                                blnFatal = true
+                Call ErrorHandler("WMI Connect",strMsg,blnFatal)
+                End If
+
+                Const EWX_LOGOFF = 0 
+                Const EWX_SHUTDOWN = 1 
+                Const EWX_REBOOT = 2 
+                Const EWX_FORCE = 4 
+                Const EWX_POWEROFF = 8 
+                
+                'set PC to reboot
+                If strRestart = 1 Then
+
+                                For each OpSys in OpSysSet 
+                                                opSys.win32shutdown EWX_REBOOT + EWX_FORCE
+                                Next 
+
+                'set PC to shutdown
+                ElseIf strRestart = 2 Then
+                                                                
+                                For each OpSys in OpSysSet 
+                                                opSys.win32shutdown EWX_POWEROFF + EWX_FORCE
+                                Next 
+  
+  'Do nothing...
+  ElseIf strRestart = "0" Then
+                                                                
+End If#>
+
+# PowerShell
+
+Restart-Computer -Wait
+# ----------------------------------------------------------
+# Change Registry Keys and Restart Service
+# ----------------------------------------------------------
+
+# VB Script
+
+<#Dim Tempshell,Tempcimv2
+
+Set Tempshell = CreateObject("WScript.shell")
+
+writelog("Altering reg settings for WSUS server")
+
+Shell.RegWrite "HKLM\Software\Policies\Microsoft\Windows\WindowsUpdate\WUServer","http://contoso.com","REG_SZ"
+Shell.RegWrite "HKLM\Software\Policies\Microsoft\Windows\WindowsUpdate\WUStatusServer","http://contoso","REG_SZ"
+
+Set Tempcimv2 = GetObject("winmgmts:\\.\root\CIMV2")
+
+  'Get the service object
+  Set oService = Tempcimv2.Get("Win32_Service.Name='wuauserv'")
+ 
+writelog("Stopping service") 
+  oService.Stop
+  
+  Wscript.Sleep 1000
+writelog("Starting service") 
+  oService.Start#>
+
+# PowerShell
+
+$keyValue = "http://contoso.com"
+
+Set-ItemProperty -Path "HKLM\Software\Policies\Microsoft\Windows\WindowsUpdate\" -Name WUServer -Value $keyValue -Force
+Set-ItemProperty -Path "HKLM\Software\Policies\Microsoft\Windows\WindowsUpdate\" -Name WUStatusServer -Value $keyValue -Force
+
+Restart-Service -name wuauserv
+
+# ----------------------------------------------------------
+# Change Phone Attribute in AD
+# ----------------------------------------------------------
+
+
+<#Option Explicit
+Dim strUser, rootDSE, adoConnection, ldapStr, adoRecord, objUser, strExt, objExt, strMsg, choice
+
+' Change the attribute in the 4 numbered locations and save as new VBS.
+
+struser = WScript.Arguments(0)
+
+Set rootDSE = GetObject("LDAP://RootDSE")
+Set adoConnection = CreateObject("ADODB.Connection")
+adoConnection.Provider = "ADSDSOObject"
+adoConnection.Open "ADs Provider"
+
+ldapStr = "<LDAP://" & rootDSE.Get("defaultNamingContext") & ">;(&(objectCategory=Person)(objectClass=User)(samAccountName=" & strUser & "));adspath;subtree"
+
+Set adoRecord = adoConnection.Execute(ldapStr)
+Set objUser = GetObject (adoRecord.Fields(0).Value)
+
+' 1
+
+strMsg = "The current extension is: " & objUser.telephoneNumber & VbCrLf & VbCrLf & _
+    "Do you want to change this user's extension in AD?"
+
+choice = MsgBox(strMsg,4,"Change Extension?")
+
+If choice = 6 Then
+
+' 2
+
+strExt = Inputbox("Enter Extension:","Enter Extension",objUser.telephoneNumber)
+
+If Not adoRecord.EOF Then
+    On Error Resume Next
+
+' 3
+        objUser.Put "telephoneNumber", "x" & strExt
+        objUser.SetInfo
+    On Error GoTo 0
+End If
+
+End If
+
+'Set objExt = GetObject("LDAP://" & objUser.distinguishedName)
+
+' 4
+
+MsgBox "Extension: " & objUser.telephoneNumber,0,"User's Extension"#>
+
+# PowerShell
+
+Function Change-Mobile
+    {
+        param($UserName,$MobileNumber,[switch]$Change)
+
+        if ($Change -ne $true)
+            {
+            $number = (Get-AdUser -Identity $UserName -Properties Mobile).Mobile
+            Write-Output "Current Mobile is: $number"
+            }
+        else
+            {
+            $number = (Get-AdUser -Identity $UserName -Properties Mobile).Mobile
+            Write-Output "Current Mobile is: $number"
+            Set-ADUser -Identity $UserName -MobilePhone $MobileNumber -PassThru
+            }
+    }
+
+
+
+
+

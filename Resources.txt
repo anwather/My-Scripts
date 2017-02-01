@@ -1,0 +1,9 @@
+Scripting Guys - http://blogs.technet.com/b/heyscriptingguy/
+
+Jeffrey Snover - http://www.jsnover.com/blog/
+
+Don Jones - http://powershell.com/cs/blogs/donjones/default.aspx
+
+Awesome PowerShell site - http://powershell.com
+
+

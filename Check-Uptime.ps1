@@ -1,19 +1,47 @@
-$list = Get-Content .\serverlist.txt
+﻿Import-Module ActiveDirectory
 
-$myArray = @()
+$computerList = (Get-ADComputer -filter *).Name
 
-foreach ($server in $list)
+#$computerList = "FakeComputer","2012R2-DC","2012R2-MS","WIN8-WS"
+
+$testArray = @()
+
+foreach ($computer in $computerList)
     {
-    if (Test-Connection -computername $server -Count 1 -Quiet)
+
+    try 
         {
-            $uptime = Get-WmiObject -ComputerName $server -Class Win32_operatingSystem -ErrorAction SilentlyContinue
-            $lastBoot = $($uptime.ConvertToDateTime($uptime.LastBootUpTime))
-            $diff = ((Get-Date) - $lastBoot).Days
-            $props = @{"Server Name" = $server;
-                       "Uptime (Days)" = $diff}
-            $obj = New-Object -TypeName PSObject -Property $props
-            $myArray += $obj
+        $ping = Test-Connection -ComputerName $computer -Count 1 -ErrorAction STOP
         }
+    catch
+        {
+        $OS = "Unknown"
+        $LastBootTime = "Unknown"
+        $Uptime
+        $ping = $null
+        $uptime = "Unknown"
+        }
+
+    if ($ping)
+        {
+            switch ($ping.ResponseTimeToLive)
+                {
+                    {$_ -eq $null} {$OS = "Windows";break}
+                    {$_ -le 64} {$OS = "Linux";break}
+                    {$_ -le 128} {$OS = "Windows";break}
+                    {$_ -le 255} {$OS = "UNIX";break}
+                }
+            $wmi = Get-WMIObject -Class Win32_OperatingSystem -ComputerName $computer
+            $LastBootTime = $wmi.ConvertToDateTime($wmi.LastBootUpTime)
+            $uptime = ((Get-Date)-$LastBootTime).Days
+        }
+    $testArray += New-Object PSObject -Property @{
+        Name = $computer
+        OS = $OS
+        "Last Reboot Time" = $LastBootTime
+        "Uptime in Days" = $uptime
+        }
+
     }
 
-$myArray  
+$testArray | Out-GridView

@@ -1,0 +1,14 @@
+﻿<# Determine the error type for a given error
+
+1) Force the error to occur.
+
+2) Get the value of $Error[0].CategoryInfo.Reason
+
+3) Create a new catch block inside the script
+
+4) After the catch use an open bracket and past the result of Step 2.
+
+5) Press TAB and let PowerShell expand the full exception class
+
+6) Close the square bracket
+#>

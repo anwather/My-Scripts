@@ -1,0 +1,4 @@
+Sort an imported CSV after casting to a different object type.
+--------------------------------------------------------------
+
+import-csv C:\temp\process.csv | Sort-Object {[double]$_.WorkingSet} -Descending | select Name, Handles,CPU,WorkingSet

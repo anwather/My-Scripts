@@ -1,0 +1,1 @@
+﻿"bits","spooler" | Foreach {Get-Service $_}

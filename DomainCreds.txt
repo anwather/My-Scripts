@@ -1,0 +1,52 @@
+﻿# Intialise Variables
+$domain = "Contoso"
+$intDomain = "contoso.com"
+$groupDN = "GG-ADM-Build"
+
+# Function Definition
+function Get-DomainCreds 
+    {
+        $global:creds = Get-Credential -message "Please authenticate to $domain"
+        $global:UserName = $creds.username
+        $encPassword = $creds.password
+        $password = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto([System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($encpassword))
+        $Domain=$intDomain
+
+        #Validate username against AD
+        Add-Type -AssemblyName System.DirectoryServices.AccountManagement
+        $ct = [System.DirectoryServices.AccountManagement.ContextType]::Domain
+        $pc = New-Object System.DirectoryServices.AccountManagement.PrincipalContext $ct,$Domain
+        $authed = $pc.ValidateCredentials($UserName,$Password)
+    
+        if ($authed -eq $false) 
+            {
+                # Authentication failed - rerun the function
+                [System.Reflection.Assembly]::LoadWithPartialName("System.Windows.Forms") | Out-Null
+                        <#$button = [System.Windows.Forms.MessageBoxButtons]::OK
+                        $option = [System.Windows.Forms.MessageBoxOptions]::ServiceNotification
+                        $icon = [System.Windows.Forms.MessageBoxIcon]::Exclamation
+                        $defaultbutton = [System.Windows.Forms.MessageBoxDefaultButton]::Button1#>
+                        [System.Windows.Forms.MessageBox]::Show("Authentication failed - please retry","Group Check Alert",$button,$icon,$defaultbutton,$option)
+                Get-DomainCreds
+            }
+        else
+            {
+               # Authentication passed - verify group membership against web service
+               $uri = "http://contoso.com/osdwebservices/ad.asmx/IsUserGroupMember?UserName=$username&GroupName=$groupDN"
+               $r = Invoke-RestMethod -Uri $uri
+               if ($($r.boolean.'#text') -eq 'false')
+                    {
+                        # User is not a member of the group
+                        [System.Reflection.Assembly]::LoadWithPartialName("System.Windows.Forms") | Out-Null
+                        <#$button = [System.Windows.Forms.MessageBoxButtons]::OK
+                        $option = [System.Windows.Forms.MessageBoxOptions]::ServiceNotification
+                        $icon = [System.Windows.Forms.MessageBoxIcon]::Exclamation
+                        $defaultbutton = [System.Windows.Forms.MessageBoxDefaultButton]::Button1#>
+                        [System.Windows.Forms.MessageBox]::Show("Authentication failed - user is not part of group!","Group Check Alert",$button,$icon,$defaultbutton,$option)
+                        Get-DomainCreds
+                    }
+            }
+    }
+#Main
+Get-DomainCreds
+
