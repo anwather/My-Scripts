@@ -1,0 +1,1 @@
+﻿Register-PSRepository -Name PSGallery -InstallationPolicy Untrusted -SourceLocation https://www.powershellgallery.com/api/v2/
