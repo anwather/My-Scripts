@@ -14,7 +14,7 @@ Process {
         $obj = [PSCustomObject]@{
         ComputerName = $ComputerName
         Drives = Get-Volume –cimsession $session 
-        NetAdapters = Get-NetAdapter –cimsession $session | Select-Object –Property Name, InterfaceIndex, Status, PSComputerName
+        NetAdapters = Get-NetAdapter –cimsession $session | Select-Object -Property Name, InterfaceIndex, Status, PSComputerName
         }
         return $obj
     }
