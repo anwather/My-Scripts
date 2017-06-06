@@ -1,1 +1,1 @@
-GCM | Select Name |sort -Property length | Select @{Name="Name";Expression={$_}}, @{Name="Length";Expression={$_.Length}}
+Get-Command| Select-Object Name | Sort-Object -Property length | Select-Object @{Name="Name";Expression={$_}}, @{Name="Length";Expression={$_.Length}}
