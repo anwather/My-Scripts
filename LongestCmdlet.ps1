@@ -1,1 +1,1 @@
-$names |sort -Property length | Select @{Name="Name";Expression={$_}}, @{Name="Length";Expression={$_.Length}}
+GCM | Select Name |sort -Property length | Select @{Name="Name";Expression={$_}}, @{Name="Length";Expression={$_.Length}}
