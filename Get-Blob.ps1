@@ -45,7 +45,7 @@ Function Get-Blob
         }
     else
         {
-            $blob = Get-AzureStorageBlob -Container $StorageContainerName -Context $context | Where Name -eq $File
+            $blob = Get-AzureStorageBlob -Container $StorageContainerName -Context $context | Where-Object Name -eq $File
         }
     
     $blob | Get-AzureStorageBlobContent -Destination $Destination -Verbose
