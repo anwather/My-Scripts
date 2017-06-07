@@ -4,7 +4,7 @@
         mock 'Get-ChildItem' { 
             
             $obj = New-MockObject -Type 'System.IO.FileInfo' -Verbose -Debug
-           Grandma
+           #Grandma
         }
 
         Get-ChildItem c:\Windows
