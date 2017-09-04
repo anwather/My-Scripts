@@ -2,3 +2,4 @@
 
 "this is a string" -cmatch '(T\w+)'
 
+$r = [regex]::Matches("dev dev","dev")
