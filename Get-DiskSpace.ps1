@@ -1,4 +1,4 @@
-﻿#gwmi win32_logicaldisk | select deviceid, @{Name = "Free Space";Expression = {[math]::Round($_.freespace / 1GB)}} | ft -AutoSize
+#gwmi win32_logicaldisk | select deviceid, @{Name = "Free Space";Expression = {[math]::Round($_.freespace / 1GB)}} | ft -AutoSize
 function Get-DiskSpace {
 param ($computername,$diskname)
 
@@ -31,3 +31,5 @@ foreach ($disk in $disks)
     Write-Host
     }
 }
+
+Get-DiskSpace -computername localhost

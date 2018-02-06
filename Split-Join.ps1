@@ -1,4 +1,9 @@
-﻿$string = $env:Temp
+# New comment
+# Added another new comment
+# More pointless comments
+# More comment
+
+$string = $env:Temp
 
 Write-Output "Before Split"
 Write-Output "------------"
@@ -21,5 +26,3 @@ Write-Output "------------"
 Write-Output $string
 Write-Output $string.GetType()
 Write-Output " "
-
-
