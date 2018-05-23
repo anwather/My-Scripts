@@ -1,10 +1,10 @@
 Function Search-Updates {
-$Criteria = "IsInstalled=0 and Type='Software'"
-#Search for relevant updates.
-$Searcher = New-Object -ComObject Microsoft.Update.Searcher
-$SearchResult = $Searcher.Search($Criteria).Updates
+    $Criteria = "IsInstalled=0 and Type='Software'"
+    #Search for relevant updates.
+    $Searcher = New-Object -ComObject Microsoft.Update.Searcher
+    $SearchResult = $Searcher.Search($Criteria).Updates
 
-return [System.MarshalByRefObject]$SearchResult
+    return [System.MarshalByRefObject]$SearchResult
 }
 
 Function Download-Updates {

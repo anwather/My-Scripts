@@ -1,4 +1,4 @@
-﻿$serverList = "AUS-CM01","AUS-SCSM01","AUS-SCSM02","AUS-SCOM01","AUS-SCORCH01"
+﻿$serverList = "AUS-CM01", "AUS-SCSM01", "AUS-SCSM02", "AUS-SCOM01", "AUS-SCORCH01"
 #$serverList = "AUS-SCORCH01","AUS-CM01"
 $resultServer = "AUS-SCORCH01"
 $resultDB = "PatchingAdmin"
@@ -38,7 +38,7 @@ Select @@ServerName AS ServerName,@@Version As Version
 }
 
 $updatesb = {
-Param($Params)
+    Param($Params)
 
     $serverName = $params.ServerName
     $version = $params.Version
@@ -67,16 +67,14 @@ INSERT INTO [dbo].[Versions]
     $sqlConnection.Open()
     $sqlcmd.ExecuteNonQuery() | Out-Null
     $sqlConnection.Close()
-    }
+}
 
 
-foreach ($server in $serverList)
-    {
-    if (Test-Connection -ComputerName $server -Count 1 -Quiet)
-        {
+foreach ($server in $serverList) {
+    if (Test-Connection -ComputerName $server -Count 1 -Quiet) {
         $params = @{
             ServerName = $server
-            }
+        }
 
         $session = New-PSSession -ComputerName $server
         $result = Invoke-Command -Session $session -ArgumentList $params -ScriptBlock $sb
@@ -84,16 +82,15 @@ foreach ($server in $serverList)
         #Transform the results
         $params = @{
             ServerName = $result.ServerName
-            Version = $result.Version.Split() | Select-String -Pattern "^\d{2}`.\d{1}`.\d{4}`.\d{1}$"
-            }
+            Version    = $result.Version.Split() | Select-String -Pattern "^\d{2}`.\d{1}`.\d{4}`.\d{1}$"
+        }
         #Write to the db
         $session = New-PSSession -ComputerName $resultServer
         $result = Invoke-Command -Session $session -ArgumentList $params -ScriptBlock $updatesb
         Remove-PSSession $session
 
-        }
-    else
-        {
-        Write-Output "Server $server is not responding"
-        }
     }
+    else {
+        Write-Output "Server $server is not responding"
+    }
+}

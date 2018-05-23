@@ -1,10 +1,9 @@
-﻿Function Connect-AzureVM
-    {
+﻿Function Connect-AzureVM {
 
     [CmdletBinding()]
     Param(
-    $ResourceGroupName,
-    $ComputerName
+        $ResourceGroupName,
+        $ComputerName
     )
 
     $ipAddress = Get-AzureRmPublicIpAddress -ResourceGroupName $resourceGroupName | Where Name -match $ComputerName | Select -ExpandProperty IpAddress
@@ -13,4 +12,4 @@
 
     Invoke-Expression $cmd
 
-    }
+}

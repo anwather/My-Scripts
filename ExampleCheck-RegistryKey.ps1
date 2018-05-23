@@ -1,10 +1,8 @@
-﻿if (Test-path HKLM:\software\MyKey)
-    {
+﻿if (Test-path HKLM:\software\MyKey) {
     "Key exists"
-    }
-    else
-    {
+}
+else {
     "Key does not exist"
     New-Item HKLM:\SOFTWARE\MyKey -force
-    }
+}
 
