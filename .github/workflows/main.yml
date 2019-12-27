@@ -14,8 +14,8 @@ jobs:
       # Github token
           github-token: ${{ secrets.GITHUB_TOKEN }}
       # keywords to look for in the issue
-          keywords: 'Test'
+          keywords: '["Test"]'
       # assignees to be assigned when keyword is found
       # assignees: # optional
       # labels to be set when keyword is found
-          labels: 'TestLabel'
+          labels: '["testing"]'
